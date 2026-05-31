@@ -1,17 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI 
 from pydantic import BaseModel
+from typing import Optional
 
-app = FastAPI()
+app = FastAPI() 
 
-class PatientRegistration(BaseModel):
-    name: str
+class PatientRegistration(BaseModel): 
+    name: str 
     age: int
-    gender: str 
-    phone_no: str
+    gender: str
+    phone_no: str 
     email_id: str
     password: str
-
-class PatientLogin(BaseModel):
+    
+class PatientLogin(BaseModel): 
     email_id: str
     password: str
 
@@ -21,3 +22,9 @@ class PatientProfile(BaseModel):
     email_id: str
     phone_no: str
    
+class ProfileUpdate(BaseModel):
+    name: str | None = None
+    email_id: str | None = None
+    age: int | None = None
+    phone_no: str | None = None
+    profile_pic: str | None = None
