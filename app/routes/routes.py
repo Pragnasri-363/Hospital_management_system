@@ -1,6 +1,6 @@
 from fastapi import FastAPI 
 from fastapi import Depends,HTTPException, status
-from app.schemas.patient_schema import PatientRegistration,PatientLogin,PatientProfile,ProfileUpdate
+from app.schemas.patient_schema import PatientRegistration,PatientLogin,PatientProfile,ProfileUpdate, ChangePassword
 from app.models.patient_model import Patient
 from sqlalchemy.orm import Session
 from app.database.connection import get_db
@@ -73,7 +73,7 @@ async def get_profile( current_user: Patient = Depends(get_current_user)):
     
 
 @app.patch("/patient/profile/edit")
-async def edit_profile(profile_data: ProfileUpdate, current_user: Patient = Depends(get_current_user),db: Session = Depends(get_db)):
+async def edit_profile(profile_data: ProfileUpdate, current_user: Patient = Depends(get_current_user), db: Session = Depends(get_db)):
     query=db.query(Patient).filter(Patient.email_id==current_user.email_id)
     user=query.first()
     
@@ -90,8 +90,31 @@ async def edit_profile(profile_data: ProfileUpdate, current_user: Patient = Depe
     db.commit()
     db.refresh(user)
 
-    return user
+    return {"message" : "Updated profile succssefully" , "User": user}    
 
+@app.patch("/change-password")
+async def change_password(change_password: ChangePassword, current_user: Patient = Depends(get_current_user), db: Session = Depends(get_db)):
 
+    #Verify current password
+    if not verify_password(change_password.password,current_user.password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password entered is incorrect.")
     
+    #verify if old and new password are different
+    if change_password.new_password==change_password.password:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="New password must be different from current password.")
+    
+    #check new password and confirm password
+    if change_password.new_password!=change_password.confirm_password:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="New password and confirm password do not match.")
+    
+    #hash new password
+    hashed_password=hash_password(change_password.new_password)
 
+    current_user.password = hashed_password
+
+    db.commit()
+    db.refresh(current_user)
+
+    return {
+        "message":"Password changed successfully."
+    }

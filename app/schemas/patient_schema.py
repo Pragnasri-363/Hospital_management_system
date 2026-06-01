@@ -28,3 +28,8 @@ class ProfileUpdate(BaseModel):
     age: int | None = None
     phone_no: str | None = None
     profile_pic: str | None = None
+
+class ChangePassword(BaseModel):
+    password: str
+    new_password: str
+    confirm_password: str
