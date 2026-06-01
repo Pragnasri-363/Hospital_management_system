@@ -1,12 +1,17 @@
 from fastapi import FastAPI 
 from fastapi import Depends,HTTPException, status
-from app.schemas.patient_schema import PatientRegistration,PatientLogin,PatientProfile,ProfileUpdate, ChangePassword
+from app.schemas.patient_schema import PatientRegistration,PatientLogin,PatientProfile,ProfileUpdate, ChangePassword,ResetPassword,ForgotPassword
 from app.models.patient_model import Patient
 from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 from app.auth.jwt_handler import hash_password, verify_password, create_access_token, get_current_user
 from app.database.connection import engine, Base
+import jwt
+
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 app = FastAPI()
 
@@ -93,10 +98,10 @@ async def edit_profile(profile_data: ProfileUpdate, current_user: Patient = Depe
     return {"message" : "Updated profile succssefully" , "User": user}    
 
 @app.patch("/change-password")
-async def change_password(change_password: ChangePassword, current_user: Patient = Depends(get_current_user), db: Session = Depends(get_db)):
+async def change_password(change_password: ChangePassword, current_user: Patient = Depends(get_current_user),db: Session = Depends(get_db)):
 
     #Verify current password
-    if not verify_password(change_password.password,current_user.password):
+    if not verify_password(change_password.password, current_user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password entered is incorrect.")
     
     #verify if old and new password are different
@@ -118,3 +123,52 @@ async def change_password(change_password: ChangePassword, current_user: Patient
     return {
         "message":"Password changed successfully."
     }
+
+@app.post("/forgot-password")
+async def forgot_password(patient: ForgotPassword, db: Session = Depends(get_db)):
+    user=db.query(Patient).filter(Patient.email_id == patient.email_id).first()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found.")
+    
+    reset_token = create_access_token({"sub": user.email_id})
+
+    return {"reset_token": reset_token}
+
+@app.post("/reset-password")
+async def  reset_pasword(reset_password: ResetPassword , db: Session = Depends(get_db) ):
+    try:
+        payload = jwt.decode(
+            reset_password.token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+            )
+
+        email = payload.get("sub")
+
+        if email is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token."
+            )
+        
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token."
+        )
+    
+    user = db.query(Patient).filter(Patient.email_id == email).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+
+    if reset_password.new_password != reset_password.confirm_password:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="New password and confirm password do not match.")
+    
+    user.password = hash_password(reset_password.new_password)
+
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "message":"Password  reset successfull"}  

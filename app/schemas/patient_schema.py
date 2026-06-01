@@ -21,7 +21,7 @@ class PatientProfile(BaseModel):
     pic: str
     email_id: str
     phone_no: str
-   
+
 class ProfileUpdate(BaseModel):
     name: str | None = None
     email_id: str | None = None
@@ -33,3 +33,12 @@ class ChangePassword(BaseModel):
     password: str
     new_password: str
     confirm_password: str
+
+class ForgotPassword(BaseModel):
+    email_id: str
+
+class ResetPassword(BaseModel):
+    token: str
+    new_password: str
+    confirm_password: str
+
