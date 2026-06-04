@@ -1,0 +1,104 @@
+from fastapi import FastAPI,Depends,HTTPException,status
+from fastapi.security import OAuth2PasswordRequestForm
+from app.database.connection import get_db
+from sqlalchemy.orm import Session
+from app.models.admin_model import Admin, Doctor
+from app.auth.jwt_handler import hash_password,create_access_token,verify_password
+from app.database.connection import engine, Base
+from app. schemas.admin_schema import AdminLogin, AdminProfile, AdminRegistration, ProfileUpdate, DoctorData 
+from app.auth.jwt_handler import get_current_admin
+app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
+
+@app.post("/admin-registration")
+async def reg_admin(admin: AdminRegistration, db: Session = Depends(get_db)):
+    exisiting_user= db.query(Admin).filter(Admin.email_id == admin.email_id).first()
+    if exisiting_user: 
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
+
+    hashed_password= hash_password(admin.password)
+
+    new_user = Admin(email_id=admin.email_id,
+                password=hashed_password,
+                name=admin.name,
+                gender= admin.gender, 
+                phone_no= admin.phone_no
+                )
+    
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {"name":new_user.name,"gender":new_user.gender,"phone_no":new_user.phone_no,"email_id":new_user.email_id}
+
+
+@app.post("/admin-login")
+async def admin_login(form_data: OAuth2PasswordRequestForm= Depends(), db: Session= Depends(get_db)):
+    admin = db.query(Admin).filter(Admin.email_id== form_data.username).first()
+    
+
+    if not admin:
+        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail="Invalid email or password")
+    
+
+    if not verify_password(form_data.password, admin.password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email or password")
+    
+    access_token = create_access_token({"sub": admin.email_id} )
+
+    return { "access_token": access_token, "token_type": "bearer"}
+
+@app.get("/admin-profile")
+async def get_profile(current_admin: Admin = Depends(get_current_admin)):
+    return {
+        "name": current_admin.name,
+        "gender":current_admin.gender,
+        "email": current_admin.email_id,
+        "phone": current_admin.phone_no,
+        "pic": current_admin.profile_pic,
+    }
+
+@app.patch("/admin/profile/edit")
+async def edit_profile(profile_data: ProfileUpdate, current_user: Admin = Depends(get_current_admin), db: Session = Depends(get_db)):
+    query=db.query(Admin).filter(Admin.email_id==current_user.email_id)
+    user=query.first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="Admin not found"
+        )
+    
+    query.update(
+        profile_data.model_dump(exclude_unset=True)
+    )
+
+    db.commit()
+    db.refresh(user)
+
+    return {"message" : "Updated profile succssefully" , "User": user}
+
+@app.post("/admin/add-doctor")
+async def add_doctor(doctor: DoctorData, db: Session= Depends(get_db)):
+    exisiting_doc= db.query(Doctor).filter(Doctor.email_id == doctor.email_id).first()
+    if exisiting_doc: 
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
+    
+    hashed_password= hash_password(doctor.password)
+
+    new_doc = Doctor(email_id=doctor.email_id,
+                password=hashed_password,
+                name=doctor.name,
+                gender= doctor.gender, 
+                phone_no= doctor.phone_no,
+                experience= doctor.experience,
+                education= doctor.education,
+                speciality= doctor.speciality
+                )
+    
+    db.add(new_doc)
+    db.commit()
+    db.refresh(new_doc)
+
+    return {"name":new_doc.name,"gender":new_doc.gender,"phone_no":new_doc.phone_no,"email_id":new_doc.email_id,"experience":new_doc.experience,"education":new_doc.education,"speciality":new_doc.speciality}
