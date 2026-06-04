@@ -47,7 +47,16 @@ async def admin_login(form_data: OAuth2PasswordRequestForm= Depends(), db: Sessi
     
     access_token = create_access_token({"sub": admin.email_id} )
 
-    return { "access_token": access_token, "token_type": "bearer"}
+    return {
+    "message": "Admin login successful",
+    "access_token": access_token,
+    "token_type": "bearer",
+    "admin": {
+        "name": admin.name,
+        "email": admin.email_id,
+        "gender": admin.gender
+    }
+}
 
 @app.get("/admin-profile")
 async def get_profile(current_admin: Admin = Depends(get_current_admin)):
