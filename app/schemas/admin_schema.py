@@ -32,4 +32,4 @@ class DoctorData(BaseModel):
     password: str
     experience: str
     education: str
-    speciality: str
+    specialization: str

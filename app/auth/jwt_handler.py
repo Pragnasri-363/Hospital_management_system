@@ -80,7 +80,6 @@ async def get_current_doctor(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid token"
     )
-
     try:
         payload = jwt.decode(
             token,
@@ -118,13 +117,16 @@ async def get_current_admin(
     )
 
     try:
+    
         payload = jwt.decode(
             token,
             SECRET_KEY,
             algorithms=[ALGORITHM]
         )
+        
 
         email = payload.get("sub")
+        
 
         if email is None:
             raise credentials_exception
@@ -137,8 +139,19 @@ async def get_current_admin(
         .filter(Admin.email_id == email)
         .first()
     )
-
+    
     if admin is None:
         raise credentials_exception
 
     return admin
+
+def to_dict(self):
+    return {
+            'id': self.doctor_id,
+            'name': self.name,
+            "email_id":self.email_id,
+            'specialization': self.specialization,
+            'experience': self.experience,
+            'education': self.education,
+            'phone': self.phone_no
+        }

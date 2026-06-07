@@ -20,7 +20,7 @@ class Doctor(Base):
     doctor_id: Mapped[int]= mapped_column(primary_key= True, autoincrement= True)
     name: Mapped[str]= mapped_column(String(200), nullable= False)
     experience: Mapped[int]= mapped_column(Integer, nullable= False)
-    speciality: Mapped[str]= mapped_column(String(300), nullable= False)
+    specialization: Mapped[str]= mapped_column(String(300), nullable= False)
     gender: Mapped[str]= mapped_column(String(20), nullable=True)
     phone_no: Mapped[str]= mapped_column(String(30),nullable= False)
     email_id: Mapped[str]= mapped_column(String(500), nullable= False)

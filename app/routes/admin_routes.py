@@ -6,9 +6,9 @@ from app.models.admin_model import Admin, Doctor
 from app.auth.jwt_handler import hash_password,create_access_token,verify_password
 from app.database.connection import engine, Base
 from app. schemas.admin_schema import AdminLogin, AdminProfile, AdminRegistration, ProfileUpdate, DoctorData 
-from app.auth.jwt_handler import get_current_admin
-app = FastAPI()
+from app.auth.jwt_handler import get_current_admin,to_dict
 
+app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
 @app.post("/admin-registration")
@@ -47,16 +47,9 @@ async def admin_login(form_data: OAuth2PasswordRequestForm= Depends(), db: Sessi
     
     access_token = create_access_token({"sub": admin.email_id} )
 
-    return {
-    "message": "Admin login successful",
-    "access_token": access_token,
-    "token_type": "bearer",
-    "admin": {
-        "name": admin.name,
-        "email": admin.email_id,
-        "gender": admin.gender
-    }
-}
+    return {"access_token": access_token,
+    "token_type": "bearer"}
+   
 
 @app.get("/admin-profile")
 async def get_profile(current_admin: Admin = Depends(get_current_admin)):
@@ -88,7 +81,7 @@ async def edit_profile(profile_data: ProfileUpdate, current_user: Admin = Depend
 
     return {"message" : "Updated profile succssefully" , "User": user}
 
-@app.post("/admin/add-doctor")
+@app.post("/admin/add_doctor")
 async def add_doctor(doctor: DoctorData, db: Session= Depends(get_db)):
     exisiting_doc= db.query(Doctor).filter(Doctor.email_id == doctor.email_id).first()
     if exisiting_doc: 
@@ -103,11 +96,44 @@ async def add_doctor(doctor: DoctorData, db: Session= Depends(get_db)):
                 phone_no= doctor.phone_no,
                 experience= doctor.experience,
                 education= doctor.education,
-                speciality= doctor.speciality
+                specialization= doctor.specialization
                 )
     
     db.add(new_doc)
     db.commit()
     db.refresh(new_doc)
 
-    return {"name":new_doc.name,"gender":new_doc.gender,"phone_no":new_doc.phone_no,"email_id":new_doc.email_id,"experience":new_doc.experience,"education":new_doc.education,"speciality":new_doc.speciality}
+    return {"message":"Doctor adeed successfully","name":new_doc.name,"gender":new_doc.gender,"phone_no":new_doc.phone_no,"email_id":new_doc.email_id,"experience":new_doc.experience,"education":new_doc.education,"speciality":new_doc.specialization}
+
+#Get the list of doctors present
+@app.get("/admin/get_doctors")
+async def get_doctors(current_admin: Admin = Depends(get_current_admin),db: Session= Depends(get_db)):
+
+    doctors=db.query(Doctor).all()
+    data=[]
+
+    for doctor in doctors:
+        data.append(to_dict(doctor))
+
+    return{"message":"List of doctors retrieved sucsessfully","data": {"doctors": data}}
+    
+
+#Search a particular doctor using name or specilization
+@app.get("/admin/search_doctor")
+async def search_doctor(name: str | None = None,spec: str | None = None,current_admin: Admin = Depends(get_current_admin),db: Session= Depends(get_db)):
+    
+    if name:
+        data=db.query(Doctor).filter(name == Doctor.name).all()
+
+        return{"message":"Doctor found","doctor":data}
+    
+    if spec:
+        data=db.query(Doctor).filter(spec == Doctor.specialization).all()
+
+        return{"message":"Doctor found","doctor":data}
+    
+    if not name and not spec:
+        return{"message": "Search query or specialization is required" }
+    
+
+    
