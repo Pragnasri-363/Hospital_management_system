@@ -37,3 +37,24 @@ async def get_profile( current_user: Doctor = Depends(get_current_doctor)):
         "specialization":current_user.specialization,
         "education":current_user.education
     }
+
+
+@app.post("/doctor/update-profile")
+async def update_profile(profile_data: ProfileUpdate, current_doctor: Doctor = Depends(get_current_doctor), db: Session= Depends(get_db)):
+    query=db.query(Doctor).filter(Doctor.email_id==current_doctor.email_id)
+    user=query.first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="Doctor not found"
+        )
+    
+    query.update(
+        profile_data.model_dump(exclude_unset=True)
+    )
+
+    db.commit()
+    db.refresh(user)
+
+    return {"message" : "Updated profile succssefully" , "User": user}
