@@ -3,9 +3,11 @@ from app.database.connection import get_db
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.models.admin_model import Doctor
+from app.models.doctor_model import Availability
 from app.auth.jwt_handler import hash_password, verify_password, create_access_token,get_current_doctor
 from app.database.connection import engine, Base
-from app.schemas.doctor_schema import ProfileUpdate
+from app.schemas.doctor_schema import ProfileUpdate,DoctorAvailability
+from datetime import date,time
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
@@ -58,3 +60,39 @@ async def update_profile(profile_data: ProfileUpdate, current_doctor: Doctor = D
     db.refresh(user)
 
     return {"message" : "Updated profile succssefully" , "User": user}
+
+
+def time_slot_generator(start_time: time,end_time: time,is_available: bool):
+    slots=[]
+    if start_time >= end_time:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Start time must be before than end time")
+    
+    for _ in range (start_time,end_time,30):
+        slots=slots.append(start_time,end_time)
+    
+    return slots
+
+
+
+#Set the available slots for a day/days
+@app.post("/doctor/availability")
+async def doctor_availability(availablity_data: DoctorAvailability,current_doctor: Doctor = Depends(get_current_doctor), db: Session= Depends(get_db)):
+    doctor= db.query(Doctor).filter(Doctor.doctor_id==current_doctor.doctor_id).all()
+
+    if not doctor:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail="Doctor profile not found")
+    
+    slots=[]
+
+    try:
+        new_data= Availability(doctor.date_str,
+                                    doctor.start_time,
+                                    doctor.endtime)
+
+    if len(slots)== 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No slots available")
+
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot set availability")
+
+    

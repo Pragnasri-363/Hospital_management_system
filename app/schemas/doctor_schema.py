@@ -1,5 +1,6 @@
 from fastapi import FastAPI 
 from pydantic import BaseModel
+from datetime import date, time, datetime
 
 app = FastAPI()
 
@@ -27,3 +28,9 @@ class ProfileUpdate(BaseModel):
     specialization: str | None = None
     education: str | None = None
     profile_pic: str | None = None
+
+class DoctorAvailability(BaseModel):
+    date_str: date
+    start_time: time
+    end_time: time
+    is_available: bool = True

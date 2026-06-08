@@ -1,6 +1,7 @@
 from fastapi import FastAPI 
 from pydantic import BaseModel
 
+
 class AdminRegistration(BaseModel): 
     name: str 
     gender: str
@@ -33,3 +34,4 @@ class DoctorData(BaseModel):
     experience: str
     education: str
     specialization: str
+
