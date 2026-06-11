@@ -7,7 +7,7 @@ class Availability(Base):
     __tablename__ = "availability"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.id"), nullable=False)
+    doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.doctor_id"), nullable=False)
     date_str: Mapped[date] = mapped_column(nullable=False)
     start_time: Mapped[time] = mapped_column(nullable=False)
     end_time: Mapped[time] = mapped_column(nullable=False)

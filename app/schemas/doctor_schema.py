@@ -30,6 +30,7 @@ class ProfileUpdate(BaseModel):
     profile_pic: str | None = None
 
 class DoctorAvailability(BaseModel):
+    doctor_id: int
     date_str: date
     start_time: time
     end_time: time
