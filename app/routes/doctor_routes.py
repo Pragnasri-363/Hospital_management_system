@@ -118,5 +118,3 @@ async def doctor_availability(availability_data: DoctorAvailability,current_doct
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-for route in app.routes:
-    print(route.path)
