@@ -1,12 +1,17 @@
 from fastapi import FastAPI 
 from fastapi import Depends,HTTPException, status
 from app.schemas.patient_schema import PatientRegistration,PatientLogin,PatientProfile,ProfileUpdate, ChangePassword,ResetPassword,ForgotPassword
+from app.schemas.doctor_schema import DoctorAvailability
 from app.models.patient_model import Patient
+from app.models.doctor_model import Availability
+from app.models.admin_model import Doctor
 from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
-from app.auth.jwt_handler import hash_password, verify_password, create_access_token, get_current_user
+from app.auth.jwt_handler import hash_password, verify_password, create_access_token, get_current_user,to_dict
 from app.database.connection import engine, Base
+from app. routes.doctor_routes import time_slot_generator
+from datetime import date
 import jwt
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
@@ -170,3 +175,42 @@ async def  reset_pasword(reset_password: ResetPassword , db: Session = Depends(g
 
     return {
         "message":"Password  reset successfull"}  
+
+# Search for doctor using specialization
+@app.get("/patient/search_doctors")
+async def search_doctor(spec: str | None = None, current_patient: Patient = Depends(get_current_user),db: Session= Depends(get_db)):
+    if not spec:
+        return{"message": "Specialization is required" }
+    
+    doctors= db.query(Doctor).filter(Doctor.specialization == spec).all()
+
+    if not doctors:
+        raise HTTPException(status_code=404, detail=f"No doctors found for specialization '{spec}'")
+
+    return{"message":"Doctors retrieved succssefully","doctor":doctors}
+    
+    
+    
+#View the dates available for slot booking
+@app.get("/patient/{doctor_id}/available_dates")
+async def view_availability(doctor_id : int, current_patient: Patient = Depends(get_current_user), db: Session= Depends(get_db)):
+    availability=(db.query(Availability).filter(Availability.doctor_id == doctor_id, Availability.is_available == True).all())
+
+    if not availability:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No available dates found")
+    
+    dates = list(set([a.date_str for a in availability]))
+
+    return {"doctor_id": doctor_id, "available_dates": dates}
+
+#View the slots available on a particular day
+@app.get("/patient/{doctor_id}/available_slots")
+async def view_slots(doctor_id: int, date_str: date, current_patient: Patient = Depends(get_current_user), db: Session= Depends(get_db)):
+    availability=(db.query(Availability).filter(Availability.doctor_id== doctor_id, Availability.date_str == date_str, Availability.is_available == True).first())
+
+    if not availability:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No available slots found")
+    
+    slots = time_slot_generator(availability.start_time, availability.end_time)
+
+    return {"doctor_id": doctor_id, "date": date_str, "slots": slots}
