@@ -1,6 +1,6 @@
 from app.database.connection import Base
 from datetime import date, time
-from sqlalchemy import Integer, Boolean, ForeignKey
+from sqlalchemy import Integer, Boolean, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 class Availability(Base):
@@ -12,3 +12,14 @@ class Availability(Base):
     start_time: Mapped[time] = mapped_column(nullable=False)
     end_time: Mapped[time] = mapped_column(nullable=False)
     is_available: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+class Appointment(Base):
+    __tablename__ = "appointment"
+
+    appointment_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    patient_id:Mapped[int] = mapped_column(ForeignKey("patientss.patient_id"), nullable=False)
+    doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.doctor_id"), nullable=False)
+    appointment_date: Mapped[date] = mapped_column(nullable=False)
+    start_time: Mapped[time] = mapped_column(nullable=False)
+    end_time: Mapped[time] = mapped_column(nullable=False)
+    status: Mapped[str] = mapped_column(String(50), nullable=False)
