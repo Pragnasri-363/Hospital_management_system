@@ -35,3 +35,4 @@ class DoctorAvailability(BaseModel):
     start_time: time
     end_time: time
     is_available: bool = True
+

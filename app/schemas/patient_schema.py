@@ -1,7 +1,7 @@
 from fastapi import FastAPI 
 from pydantic import BaseModel
 from typing import Optional
-
+from datetime import date, time, datetime
 app = FastAPI() 
 
 class PatientRegistration(BaseModel): 
@@ -42,3 +42,10 @@ class ResetPassword(BaseModel):
     new_password: str
     confirm_password: str
 
+class AppointmentData(BaseModel):
+    patient_id: int
+    doctor_id: int
+    appointment_date: date
+    start_time: time
+    end_time: time
+    status: str = "Scheduled"
