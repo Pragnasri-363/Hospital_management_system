@@ -36,10 +36,3 @@ class DoctorAvailability(BaseModel):
     end_time: time
     is_available: bool = True
 
-class AppointmentData(BaseModel):
-    patient_id: int
-    doctor_id: int
-    appointment_date: date
-    start_time: time
-    end_time: time
-    status: str

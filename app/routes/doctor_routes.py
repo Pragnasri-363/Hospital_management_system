@@ -3,6 +3,7 @@ from app.database.connection import get_db
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.models.admin_model import Doctor
+from app.models.patient_model import Appointment,Patient
 from app.models.doctor_model import Availability
 from app.auth.jwt_handler import hash_password, verify_password, create_access_token,get_current_doctor
 from app.database.connection import engine, Base
@@ -13,6 +14,7 @@ app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
 
+@app.post("/doctor/login")
 async def doctor_login(form_data: OAuth2PasswordRequestForm= Depends(), db: Session= Depends(get_db)):
 
     doctor = db.query(Doctor).filter(Doctor.email_id == form_data.username).first()
@@ -118,3 +120,21 @@ async def doctor_availability(availability_data: DoctorAvailability,current_doct
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
+@app.get("/doctor/appointments")
+async def get_appointments(current_doctor:Doctor = Depends(get_current_doctor), db: Session= Depends(get_db)):
+    appointments = (db.query(Appointment).filter(Appointment.doctor_id == current_doctor.doctor_id).order_by(Appointment.appointment_date, Appointment.start_time).all())
+
+    result = []
+
+    for appointment in appointments:
+        patient = (db.query(Patient).filter(Patient.patient_id == appointment.patient_id).first())
+
+        result.append({
+            "patient_name": patient.name,
+            "appointment_date": appointment.appointment_date,
+            "start_time": appointment.start_time,
+            "end_time": appointment.end_time,
+            "status": appointment.status
+        })
+
+    return result

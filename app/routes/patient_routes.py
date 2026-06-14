@@ -1,8 +1,8 @@
 from fastapi import FastAPI 
 from fastapi import Depends,HTTPException, status
-from app.schemas.patient_schema import PatientRegistration,PatientLogin,PatientProfile,ProfileUpdate, ChangePassword,ResetPassword,ForgotPassword
+from app.schemas.patient_schema import PatientRegistration,PatientLogin,PatientProfile,ProfileUpdate, ChangePassword,ResetPassword,ForgotPassword,AppointmentData
 from app.schemas.doctor_schema import DoctorAvailability
-from app.models.patient_model import Patient
+from app.models.patient_model import Patient,Appointment
 from app.models.doctor_model import Availability
 from app.models.admin_model import Doctor
 from sqlalchemy.orm import Session
@@ -11,7 +11,7 @@ from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 from app.auth.jwt_handler import hash_password, verify_password, create_access_token, get_current_user,to_dict
 from app.database.connection import engine, Base
 from app. routes.doctor_routes import time_slot_generator
-from datetime import date
+from datetime import date,datetime
 import jwt
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
@@ -214,3 +214,54 @@ async def view_slots(doctor_id: int, date_str: date, current_patient: Patient = 
     slots = time_slot_generator(availability.start_time, availability.end_time)
 
     return {"doctor_id": doctor_id, "date": date_str, "slots": slots}
+
+@app.post("/patient/appointment")
+async def patient_appointment(appointment_data: AppointmentData, current_patient: Patient = Depends(get_current_user), db: Session= Depends(get_db)):
+    doctor=db.query(Doctor).filter(Doctor.doctor_id== appointment_data.doctor_id).first()
+    current_time = datetime.now().time()
+    if not doctor:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail="Doctor profile not found")
+    
+    if appointment_data.appointment_date < date.today():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot book appointments for past dates")
+    
+    if (
+        appointment_data.appointment_date == date.today()
+        and appointment_data.start_time <= current_time
+    ):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Cannot book a past time slot")
+    
+    
+    availability=(db.query(Availability).filter(Availability.doctor_id== appointment_data.doctor_id, Availability.date_str== appointment_data.appointment_date, Availability.is_available == True).first())
+
+    if not availability:
+        raise HTTPException(status_code=404,detail="Doctor is not available on this date")
+    
+    existing = db.query(Appointment).filter(
+        Appointment.doctor_id == appointment_data.doctor_id,
+        Appointment.appointment_date == appointment_data.appointment_date,
+        Appointment.start_time == appointment_data.start_time,
+        Appointment.end_time == appointment_data.end_time,
+        Appointment.status == "Scheduled"
+    ).first()
+
+    if existing:
+        raise HTTPException(status_code=400,detail="Slot already booked")
+    
+    if (appointment_data.start_time < availability.start_time
+    or appointment_data.end_time > availability.end_time):
+        raise HTTPException(status_code=400,detail="Invalid slot")
+    
+    
+    appointment=Appointment(patient_id=current_patient.patient_id,
+                                doctor_id=appointment_data.doctor_id,
+                                appointment_date=appointment_data.appointment_date,
+                                start_time=appointment_data.start_time,
+                                end_time=appointment_data.end_time,
+                                status="Scheduled")
+    db.add(appointment)    
+    db.commit()
+    db.refresh(appointment)
+
+    return {"message": "Appointment booked successfully", "appointment_id": appointment.appointment_id}
+
