@@ -7,7 +7,7 @@ from app.models.patient_model import Appointment,Patient
 from app.models.doctor_model import Availability
 from app.auth.jwt_handler import hash_password, verify_password, create_access_token,get_current_doctor
 from app.database.connection import engine, Base
-from app.schemas.doctor_schema import ProfileUpdate,DoctorAvailability
+from app.schemas.doctor_schema import ProfileUpdate,DoctorAvailability,AppointmentStatusUpdate
 from datetime import date,time,timedelta,datetime
 
 app = FastAPI()
@@ -138,3 +138,34 @@ async def get_appointments(current_doctor:Doctor = Depends(get_current_doctor), 
         })
 
     return result
+
+@app.patch("/doctor/update-appointments-status/{appointment_id}")
+async def update_appointments_status(appointment_id: int,data:AppointmentStatusUpdate,current_doctor: Doctor = Depends(get_current_doctor),db: Session = Depends(get_db)):
+    appointment = (db.query(Appointment).filter(Appointment.appointment_id == appointment_id).first())
+    if not appointment:
+        raise HTTPException(status_code=404, detail="No appointment found")
+
+    
+    if appointment.doctor_id != current_doctor.doctor_id:
+        raise HTTPException(status_code=403, detail="You can only update your own appointments")
+        
+    allowed_status = ["Scheduled", "Completed", "Cancelled"]
+    if appointment.status == data.status:
+        raise HTTPException(status_code=400, detail=f"Appointment is already {data.status}")
+    
+    if data.status not in allowed_status:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Not valid status")
+        
+    if appointment.status in ["Completed", "Cancelled"]:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Appointment status can no longer be modified")
+        
+    appointment.status = data.status
+
+    db.commit()
+    db.refresh(appointment)
+
+    return {
+        "message": "Appointment status updated successfully",
+        "appointment_id": appointment.appointment_id,
+        "status": appointment.status
+        }
