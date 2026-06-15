@@ -36,3 +36,5 @@ class DoctorAvailability(BaseModel):
     end_time: time
     is_available: bool = True
 
+class AppointmentStatusUpdate(BaseModel):
+    status: str
