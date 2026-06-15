@@ -265,3 +265,30 @@ async def patient_appointment(appointment_data: AppointmentData, current_patient
 
     return {"message": "Appointment booked successfully", "appointment_id": appointment.appointment_id}
 
+@app.get("/patient/my-appointments")
+async def my_appointments(
+    current_patient: Patient = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    appointments = (db.query(Appointment).filter(Appointment.patient_id == current_patient.patient_id).order_by(Appointment.appointment_date.desc(),Appointment.start_time.desc()).all())
+
+    if not appointments:
+        raise HTTPException(status_code=404,detail="No appointments found")
+
+    result = []
+
+    for appointment in appointments:
+
+        doctor = (db.query(Doctor).filter(Doctor.doctor_id == appointment.doctor_id).first())
+
+        result.append({
+            "doctor_name": doctor.name,
+            "specialization": doctor.specialization,
+            "appointment_date": appointment.appointment_date,
+            "start_time": appointment.start_time,
+            "end_time": appointment.end_time,
+            "status": appointment.status
+        })
+
+    return result
