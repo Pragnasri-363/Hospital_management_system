@@ -292,3 +292,25 @@ async def my_appointments(
         })
 
     return result
+
+@app.patch("/doctor/appointment/{appointment_id}/cancel")
+async def cancel_appointments(appointment_id: int, current_user: Patient = Depends(get_current_user),db: Session = Depends(get_db)):
+    appointment = (db.query(Appointment).filter(Appointment.appointment_id == appointment_id).first())
+
+    if not appointment:
+        raise HTTPException(status_code=404, detail="No appointment found")
+
+    
+    if appointment.patient_id != current_user.patient_id:
+        raise HTTPException(status_code=403, detail="You can only update your own appointments")
+        
+    if appointment.status == "Completed":
+        raise HTTPException(status_code=400, detail="Completed appointment cannot be cancelled")
+    
+    if appointment.status == "Cancelled":
+        raise HTTPException(status_code=400, detail=f"Appointment is already Cancelled")
+    
+    appointment.status = "Cancelled"
+
+    db.commit()
+    db.refresh(appointment)

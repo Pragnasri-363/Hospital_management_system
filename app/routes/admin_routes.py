@@ -136,4 +136,3 @@ async def search_doctor(name: str | None = None,spec: str | None = None,current_
         return{"message": "Search query or specialization is required" }
     
 
-    
