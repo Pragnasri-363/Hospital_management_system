@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.database.connection import get_db
 from sqlalchemy.orm import Session
 from app.models.admin_model import Admin, Doctor
+from app.models.patient_model import Appointment,Patient
 from app.auth.jwt_handler import hash_password,create_access_token,verify_password
 from app.database.connection import engine, Base
 from app. schemas.admin_schema import AdminLogin, AdminProfile, AdminRegistration, ProfileUpdate, DoctorData 
@@ -136,3 +137,27 @@ async def search_doctor(name: str | None = None,spec: str | None = None,current_
         return{"message": "Search query or specialization is required" }
     
 
+@app.get("/admin/appointments")
+async def get_appointments(current_admin: Admin = Depends(get_current_admin), db: Session= Depends(get_db)):
+    appointments = (db.query(Appointment).order_by(Appointment.appointment_date.desc(), Appointment.start_time).all())
+
+    if not appointments:
+        raise HTTPException(status_code=404, detail="No appointments found")
+    result = []
+
+    for appointment in appointments:
+        patient = (db.query(Patient).filter(Patient.patient_id == appointment.patient_id).first())
+
+        doctor = (db.query(Doctor).filter(Doctor.doctor_id == appointment.doctor_id).first())
+
+        result.append({
+            "appointment_id": appointment.appointment_id,
+            "doctor_name": doctor.name,
+            "patient_name": patient.name,
+            "appointment_date": appointment.appointment_date,
+            "start_time": appointment.start_time,
+            "end_time": appointment.end_time,
+            "status": appointment.status
+        })
+
+    return result
