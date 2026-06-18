@@ -1,0 +1,52 @@
+.single-slider {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 600px;
+
+}
+
+body {
+    font-family: "Manrope", sans-serif;
+}
+
+.navbar {
+    padding-left: 40px;
+    padding-right: 120px;
+}
+
+.card {
+    background-color: lightblue;
+    color: black;
+    border: none;
+    border-radius: 20px;
+    min-height: 400px;
+    transition: 0.3s ease;
+    margin: 15px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card img {
+    width: 50px;
+    height: 80px;
+    margin: 20px auto 10px auto;
+    display: block;
+}
+
+.card-title {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.card-text {
+    text-align: center;
+    font-size: 15px;
+}
+
+.cards-section {
+    margin: 40px;
+}

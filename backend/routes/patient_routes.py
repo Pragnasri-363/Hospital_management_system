@@ -1,16 +1,16 @@
 from fastapi import FastAPI 
 from fastapi import Depends,HTTPException, status
-from app.schemas.patient_schema import PatientRegistration,PatientLogin,PatientProfile,ProfileUpdate, ChangePassword,ResetPassword,ForgotPassword,AppointmentData
-from app.schemas.doctor_schema import DoctorAvailability
-from app.models.patient_model import Patient,Appointment
-from app.models.doctor_model import Availability
-from app.models.admin_model import Doctor
+from backend.schemas.patient_schema import PatientRegistration,PatientLogin,PatientProfile,ProfileUpdate, ChangePassword,ResetPassword,ForgotPassword,AppointmentData
+from backend.schemas.doctor_schema import DoctorAvailability
+from backend.models.patient_model import Patient,Appointment
+from backend.models.doctor_model import Availability
+from backend.models.admin_model import Doctor
 from sqlalchemy.orm import Session
-from app.database.connection import get_db
+from backend.database.connection import get_db
 from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
-from app.auth.jwt_handler import hash_password, verify_password, create_access_token, get_current_user,to_dict
-from app.database.connection import engine, Base
-from app. routes.doctor_routes import time_slot_generator
+from backend.auth.jwt_handler import hash_password, verify_password, create_access_token, get_current_user,to_dict
+from backend.database.connection import engine, Base
+from backend.routes.doctor_routes import time_slot_generator
 from datetime import date,datetime
 import jwt
 

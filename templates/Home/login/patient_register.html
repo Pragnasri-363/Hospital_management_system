@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Register</title>
+    <link rel="stylesheet" href="../../../static/register.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <form action="/patient/login" method="post">
+
+                <h2 class="portal-heading">Patient Register</h2>
+
+                <div class="field-group">
+                    <label class="field-icon">
+                        <i class="fa-solid fa-user"></i>
+                    </label>
+                
+                    <input type="name" placeholder="Name" class="field-input" name="name" required>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-icon">
+                        <i class="fa-solid fa-cake-candles"></i>
+                    </label>
+                
+                    <input type="age" placeholder="Age" class="field-input" name="age" required>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-icon">
+                        <i class="fa-solid fa-venus-mars"></i>
+                    </label>
+                
+                    <select class="field-input" name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                </div>
+
+                <div class="field-group">
+                    <label class="field-icon">
+                        <i class="fa-solid fa-envelope"></i>
+                    </label>
+
+                    <input type="email" placeholder="Email Address" class="field-input" name="email" required>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-icon">
+                        <i class="fa-solid fa-lock"></i>
+                    </label>
+
+                    <input type="password" placeholder="Password" class="field-input" name="password" required>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </label>
+                
+                    <input type="confirm password" placeholder="Confirm Password" class="field-input" name="confirm password" required>
+                </div>
+
+                <button type="submit" class="portal-button">
+                    Register
+                </button>
+
+                <div class="account-action">
+                    Already have an account?
+
+                    <a href="/patient-register" class="register-action">
+                        Login Here
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,168 @@
+body {
+    background: #f4f8fb;
+    font-family: "Manrope", sans-serif;
+    min-height: 100vh;
+    background-image: url("../images/profile.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.profile-container {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 40px;
+}
+
+.profile-card {
+
+    width: 800px;
+    height: 700px;
+    background: white;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+
+.profile-banner {
+    height: 180px;
+    background: #8ECAE6;
+}
+
+.profile-header {
+
+    text-align: center;
+
+    margin-top: -75px;
+
+    padding-bottom: 25px;
+}
+
+.profile-image {
+
+    width: 150px;
+
+    height: 150px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 6px solid white;
+
+    background: white;
+}
+
+.profile-header h2 {
+
+    margin-top: 15px;
+
+    margin-bottom: 5px;
+
+    color: #0d3b66;
+
+    font-weight: 700;
+}
+
+.role-tag {
+
+    color: #6c757d;
+
+    font-size: 15px;
+}
+
+.profile-details {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 25px;
+
+    padding: 0 50px 40px;
+}
+
+.detail-box {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+.detail-box label {
+
+    margin-bottom: 8px;
+
+    font-weight: 600;
+
+    color: #0d3b66;
+}
+
+.detail-box input {
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #f5f7fa;
+
+    font-size: 15px;
+}
+
+.profile-btn {
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #8ECAE6;
+
+    color: #0d3b66;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.profile-btn:hover {
+
+    background: #74b9d6;
+}
+
+.profile-actions {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 25px;
+
+    margin-top: 20px;
+}
+
+.edit-btn,
+.save-btn {
+
+    width: auto;
+
+    padding: 12px 20px;
+
+    margin: 0;
+}

@@ -1,13 +1,13 @@
 from fastapi import FastAPI,Depends,HTTPException,status
 from fastapi.security import OAuth2PasswordRequestForm
-from app.database.connection import get_db
+from backend.database.connection import get_db
 from sqlalchemy.orm import Session
-from app.models.admin_model import Admin, Doctor
-from app.models.patient_model import Appointment,Patient
-from app.auth.jwt_handler import hash_password,create_access_token,verify_password
-from app.database.connection import engine, Base
-from app. schemas.admin_schema import AdminLogin, AdminProfile, AdminRegistration, ProfileUpdate, DoctorData 
-from app.auth.jwt_handler import get_current_admin,to_dict
+from backend.models.admin_model import Admin, Doctor
+from backend.models.patient_model import Appointment,Patient
+from backend.auth.jwt_handler import hash_password,create_access_token,verify_password
+from backend.database.connection import engine, Base
+from backend. schemas.admin_schema import AdminLogin, AdminProfile, AdminRegistration, ProfileUpdate, DoctorData 
+from backend.auth.jwt_handler import get_current_admin,to_dict
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)

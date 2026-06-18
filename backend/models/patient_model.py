@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped,mapped_column
 from sqlalchemy import String,Integer,ForeignKey,UniqueConstraint
-from app.database.connection import Base
+from backend.database.connection import Base
 from datetime import date, time
 
 class Patient(Base):

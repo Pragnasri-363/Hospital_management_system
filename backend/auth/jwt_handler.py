@@ -1,13 +1,13 @@
 from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta, timezone
-from app.database.connection import get_db
-from app.models.patient_model import Patient
+from backend.database.connection import get_db
+from backend.models.patient_model import Patient
 from fastapi import Depends,HTTPException,status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
-from app.models.admin_model import Doctor,Admin
+from backend.models.admin_model import Doctor,Admin
 pwd_context= CryptContext(schemes=["argon2"], deprecated ="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="patient/login")
