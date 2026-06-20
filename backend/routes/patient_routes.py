@@ -293,7 +293,7 @@ async def my_appointments(
 
     return result
 
-@app.patch("/doctor/appointment/{appointment_id}/cancel")
+@app.patch("/patient/appointment/{appointment_id}/cancel")
 async def cancel_appointments(appointment_id: int, current_user: Patient = Depends(get_current_user),db: Session = Depends(get_db)):
     appointment = (db.query(Appointment).filter(Appointment.appointment_id == appointment_id).first())
 
