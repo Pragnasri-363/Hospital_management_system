@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="../static/patient_dashboard/patient_book_appointment.css">
 </head>
 <body>
-    <div class="d-flex">
-        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-primary" style="width: 280px;height: 100vh;"> <a href="/"
+    <div class="dashboard-layout">
+        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-primary sidebar"> <a href="/"
                 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none"> <svg
                     class="bi pe-none me-2" width="40" height="32" aria-hidden="true">
                     <use xlink:href="#bootstrap"></use>
@@ -62,51 +62,140 @@
         <!-- MAIN CONTENT -->
         <div class="main-content">
         
-            <h3>Book Appointment</h3>
+            <h3 class="page-title">Book Appointment</h3>
         
-            <!-- STEP 1: SPECIALIZATION -->
+            <!-- Patient Information -->
+        
             <div class="step-card">
-                <h5>1. Select Specialization</h5>
         
-                <select id="specialization" class="form-select">
-                    <option value="">-- Select --</option>
-                    <option value="Cardiology">Cardiology</option>
-                    <option value="Neurology">Neurology</option>
-                    <option value="Orthopedic">Orthopedic</option>
-                    <option value="Dermatology">Dermatology</option>
-                </select>
-            </div>
+                <h5>Patient Information</h5>
         
-            <!-- STEP 2: DOCTORS -->
-            <div class="step-card">
-                <h5>2. Select Doctor</h5>
-                <div id="doctorList" class="doctor-list"></div>
-            </div>
+                <div class="row">
         
-            <!-- STEP 3 -->
-            <div class="step-card">
-                <h5>3. Date & Time</h5>
+                    <div class="col-md-4">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" value="{{ patient.full_name }}" readonly>
+                    </div>
         
-                <input type="date" class="form-control mb-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Age</label>
+                        <input type="text" class="form-control" value="{{ patient.age }}" readonly>
+                    </div>
         
-                <div class="slots">
-                    <div class="slot">10:00</div>
-                    <div class="slot">10:30</div>
-                    <div class="slot">11:00</div>
-                    <div class="slot">12:00</div>
+                    <div class="col-md-4">
+                        <label class="form-label">Gender</label>
+                        <input type="text" class="form-control" value="{{ patient.gender }}" readonly>
+                    </div>
+        
                 </div>
         
             </div>
         
-            <!-- STEP 4 -->
-            <div class="step-card">
-                <h5>4. Reason</h5>
-                <textarea class="form-control" rows="3"></textarea>
         
-                <button class="btn btn-primary w-100 mt-3">
-                    Confirm Appointment
-                </button>
+            <!-- Specialization -->
+        
+            <div class="step-card">
+        
+                <h5>Select Specialization</h5>
+        
+                <select id="specialization" class="form-select">
+        
+                    <option value="">-- Select Specialization --</option>
+        
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Neurology">Neurology</option>
+                    <option value="Orthopedic">Orthopedic</option>
+                    <option value="Dermatology">Dermatology</option>
+        
+                </select>
+        
             </div>
+        
+        
+            <!-- Doctor List -->
+        
+            <div class="step-card">
+        
+                <h5>Select Doctor</h5>
+        
+                <div id="doctorList" class="doctor-list">
+        
+                    <!-- doctors will appear here -->
+        
+                </div>
+        
+            </div>
+        
+        
+            <!-- Appointment Details -->
+        
+            <div class="step-card">
+        
+                <h5>Appointment Details</h5>
+        
+                <div class="row">
+        
+                    <div class="col-md-4">
+        
+                        <label class="form-label">Appointment Date</label>
+        
+                        <input type="date" id="appointmentDate" class="form-control">
+        
+                    </div>
+        
+                    <div class="col-md-4">
+        
+                        <label class="form-label">Start Time</label>
+        
+                        <input type="time" id="startTime" class="form-control">
+        
+                    </div>
+        
+                    <div class="col-md-4">
+        
+                        <label class="form-label">End Time</label>
+        
+                        <input type="time" id="endTime" class="form-control">
+        
+                    </div>
+        
+                </div>
+        
+            </div>
+        
+        
+            <!-- Reason -->
+        
+            <div class="step-card">
+        
+                <h5>Reason For Visit</h5>
+        
+                <textarea id="reasonForVisit" class="form-control" rows="4"
+                    placeholder="Describe your symptoms or reason for consultation..."></textarea>
+        
+            </div>
+        
+        
+            <!-- Summary -->
+        
+            <div class="step-card summary-card">
+        
+                <h5>Appointment Summary</h5>
+        
+                <p><strong>Doctor:</strong> Dr. John Doe</p>
+        
+                <p><strong>Date:</strong> 25 June 2026</p>
+        
+                <p><strong>Time:</strong> 10:00 AM - 10:30 AM</p>
+        
+            </div>
+        
+        
+            <button class="btn btn-primary confirm-btn">
+        
+                Confirm Appointment
+        
+            </button>
         
         </div>
 

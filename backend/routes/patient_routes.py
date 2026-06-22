@@ -242,7 +242,7 @@ async def patient_appointment(appointment_data: AppointmentData, current_patient
         Appointment.appointment_date == appointment_data.appointment_date,
         Appointment.start_time == appointment_data.start_time,
         Appointment.end_time == appointment_data.end_time,
-        Appointment.status == "Scheduled"
+        Appointment.status.in_(["Pending", "Scheduled"])
     ).first()
 
     if existing:
@@ -258,6 +258,7 @@ async def patient_appointment(appointment_data: AppointmentData, current_patient
                                 appointment_date=appointment_data.appointment_date,
                                 start_time=appointment_data.start_time,
                                 end_time=appointment_data.end_time,
+                                reason_for_visit=appointment_data.reason_for_visit,
                                 status="Scheduled")
     db.add(appointment)    
     db.commit()

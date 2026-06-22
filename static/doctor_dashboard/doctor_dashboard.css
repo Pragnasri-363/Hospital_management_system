@@ -1,13 +1,20 @@
 body {
     min-height: 100vh;
+    min-height: -webkit-fill-available;
 }
+
 html {
     height: -webkit-fill-available;
 }
-.dashboard-layout {
-    display: flex;
-    min-height: 100vh;
+
+main {
+    height: 100vh;
+    height: -webkit-fill-available;
+    max-height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
+
 .dropdown-toggle {
     outline: 0;
 }
@@ -70,72 +77,98 @@ html {
 
     color: #0d3b66 !important;
 }
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #f8fafc;
-}
-.sidebar {
-    width: 280px;
-    min-height: 100vh;
+.main-content {
+
+    flex: 1;
+
+    background: #ffffff;
 }
 
 .main-content {
+
     flex: 1;
-    padding: 30px;
-    background: #ffffff;
-}
-.page-title {
 
-    margin-bottom: 25px;
+    min-height: 100vh;
 
-    color: #1F3B5B;
+    background: #f8fbff;
 
-    font-weight: 600;
 }
 
-.step-card {
+.welcome-banner {
+    width: 100%;
+    padding: 20px 15px;
+}
 
-    background: white;
+.welcome-banner h3 {
 
-    padding: 24px;
+    color: #0d3b66;
 
-    margin-bottom: 20px;
+    font-weight: 700;
 
-    border-radius: 16px;
+    margin-bottom: 8px;
+}
+.stats-container {
+
+    display: flex;
+
+    gap: 20px;
+}
+
+.stats-card {
+
+    flex: 1;
+
+    padding: 22px;
+
+    border-radius: 8px;
+    margin: 20px;
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
 
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    transition: 0.3s;
 }
 
-.step-card h5 {
+.stats-card:hover {
 
-    margin-bottom: 18px;
-
-    color: #1F3B5B;
+    transform: translateY(-3px);
 }
 
-.summary-card {
+.stats-card i {
 
-    background: linear-gradient(135deg,
-            #D9F3FF,
-            #DFC8FF);
+    font-size: 28px;
 }
 
-.confirm-btn {
+.stats-card h3 {
 
-    width: 100%;
+    margin: 0;
 
-    padding: 12px;
+    font-size: 28px;
 
-    border-radius: 12px;
-
-    font-weight: 600;
-
-    margin-top: 10px;
+    font-weight: 700;
 }
 
-.form-control,
-.form-select {
+.stats-card p {
 
-    border-radius: 10px;
+    margin: 0;
+
+    color: #6c757d;
+}
+.stats-card i {
+
+    font-size: 20px;
+
+    color: black;
+}
+.pending-card {
+    background: #DDF2FF;
+
+}
+.today-card {
+
+    background: #F3E8FF;
+
 }

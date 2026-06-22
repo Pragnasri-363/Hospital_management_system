@@ -17,20 +17,44 @@ class Patient(Base):
  
 class Appointment(Base):
     __tablename__ = "appointment"
+
     __table_args__ = (
         UniqueConstraint(
             "doctor_id",
             "appointment_date",
             "start_time",
-            "end_time",
             name="unique_slot_booking"
         ),
     )
 
-    appointment_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    patient_id:Mapped[int] = mapped_column(ForeignKey("patients.patient_id"), nullable=False)
-    doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.doctor_id"), nullable=False)
+    appointment_id: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=True
+    )
+
+    patient_id: Mapped[int] = mapped_column(
+        ForeignKey("patients.patient_id"),
+        nullable=False
+    )
+
+    doctor_id: Mapped[int] = mapped_column(
+        ForeignKey("doctors.doctor_id"),
+        nullable=False
+    )
+
     appointment_date: Mapped[date] = mapped_column(nullable=False)
+
     start_time: Mapped[time] = mapped_column(nullable=False)
+
     end_time: Mapped[time] = mapped_column(nullable=False)
-    status: Mapped[str] = mapped_column(String(50), nullable=False)
+
+    reason_for_visit: Mapped[str] = mapped_column(
+        String(500),
+        nullable=False
+    )
+
+    status: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        default="Pending"
+    )

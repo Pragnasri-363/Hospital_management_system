@@ -48,4 +48,5 @@ class AppointmentData(BaseModel):
     appointment_date: date
     start_time: time
     end_time: time
+    reason_for_visit: str
     status: str = "Scheduled"
