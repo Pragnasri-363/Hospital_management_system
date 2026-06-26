@@ -1,22 +1,38 @@
 from passlib.context import CryptContext
-import jwt
+from jose import jwt,JWTError
 from datetime import datetime, timedelta, timezone
 from backend.database.connection import get_db
 from backend.models.patient_model import Patient
-from fastapi import Depends,HTTPException,status
+from fastapi import Depends,HTTPException,status,Request
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from backend.models.admin_model import Doctor,Admin
-pwd_context= CryptContext(schemes=["argon2"], deprecated ="auto")
+from fastapi.security import OAuth2
+from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
+from fastapi import Request, HTTPException, status
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="patient/login")
-oauth2_scheme_doctor = OAuth2PasswordBearer(tokenUrl="doctor/login")
-oauth2_scheme_admin = OAuth2PasswordBearer(tokenUrl="admin-login")
+
+pwd_context= CryptContext(schemes=["argon2"], deprecated ="auto")
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+class OAuth2PasswordBearerWithCookie(OAuth2):
+    def __init__(self, tokenUrl: str):
+        flows = OAuthFlowsModel(password={"tokenUrl": tokenUrl, "scopes": {}})
+        super().__init__(flows=flows)
+
+    async def __call__(self, request: Request) -> str | None:
+        
+        return request.cookies.get("patient_token") or request.cookies.get("doctor_token") or request.cookies.get("admin_token")
+
+
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/patient/login")
+oauth2_scheme_doctor = OAuth2PasswordBearerWithCookie(tokenUrl="/doctor/login")
+oauth2_scheme_admin = OAuth2PasswordBearerWithCookie(tokenUrl="/admin/login")
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -37,112 +53,76 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    request: Request,
     db: Session = Depends(get_db)
 ):
+    token = request.cookies.get("patient_token")
 
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid token"
-    )
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
 
-    try:
-        payload = jwt.decode(
-            token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+    
+
+    email = payload.get("sub")
+
+    patient = db.query(Patient).filter(
+        Patient.email_id == email
+    ).first()
+
+    if not patient:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
         )
-
-        email = payload.get("sub")
-
-        if email is None:
-            raise credentials_exception
-
-    except InvalidTokenError:
-        raise credentials_exception
-
-    patient = (
-        db.query(Patient)
-        .filter(Patient.email_id == email)
-        .first()
-    )
-
-    if patient is None:
-        raise credentials_exception
 
     return patient
 
-async def get_current_doctor(
-    token: str = Depends(oauth2_scheme_doctor),
+    
+
+def get_current_doctor(
+    request: Request,
     db: Session = Depends(get_db)
 ):
+    token = request.cookies.get("doctor_token")
 
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid token"
-    )
-    try:
-        payload = jwt.decode(
-            token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+    email = payload.get("sub")
+
+    doctor = db.query(Doctor).filter(
+        Doctor.email_id == email
+    ).first()
+
+    if not doctor:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
         )
-
-        email = payload.get("sub")
-
-        if email is None:
-            raise credentials_exception
-
-    except InvalidTokenError:
-        raise credentials_exception
-
-    doctor = (
-        db.query(Doctor)
-        .filter(Doctor.email_id == email)
-        .first()
-    )
-
-    if doctor is None:
-        raise credentials_exception
 
     return doctor
 
 async def get_current_admin(
-    token: str = Depends(oauth2_scheme_admin),
+    request: Request,
     db: Session = Depends(get_db)
 ):
 
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid token"
-    )
+    token = request.cookies.get("access_token")
 
-    try:
-    
-        payload = jwt.decode(
-            token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
-        )
-        
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
 
-        email = payload.get("sub")
-        
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    email = payload.get("sub")
 
-        if email is None:
-            raise credentials_exception
+    admin = db.query(Admin).filter(Admin.email_id == email).first()
 
-    except InvalidTokenError:
-        raise credentials_exception
-
-    admin = (
-        db.query(Admin)
-        .filter(Admin.email_id == email)
-        .first()
-    )
-    
-    if admin is None:
-        raise credentials_exception
+    if not admin:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
     return admin
 

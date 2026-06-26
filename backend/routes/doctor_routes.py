@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Depends,HTTPException, status
+from fastapi import FastAPI,Depends,HTTPException, status,APIRouter,Request,Form
 from backend.database.connection import get_db
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -9,12 +9,24 @@ from backend.auth.jwt_handler import hash_password, verify_password, create_acce
 from backend.database.connection import engine, Base
 from backend.schemas.doctor_schema import ProfileUpdate,DoctorAvailability,AppointmentStatusUpdate
 from datetime import date,time,timedelta,datetime
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import JSONResponse,RedirectResponse,HTMLResponse
 
-app = FastAPI()
+router = APIRouter()
 
 Base.metadata.create_all(bind=engine)
 
-@app.post("/doctor/login")
+templates = Jinja2Templates(directory="templates")
+templates1 = Jinja2Templates(directory="templates/Home/login")
+
+@router.get("/doctor/login-page", response_class=HTMLResponse)
+async def get_doctor_login_page(request: Request):
+    return templates1.TemplateResponse(
+        request=request, 
+        name="doctor_login.html"  
+    )
+
+@router.post("/doctor/login")
 async def doctor_login(form_data: OAuth2PasswordRequestForm= Depends(), db: Session= Depends(get_db)):
 
     doctor = db.query(Doctor).filter(Doctor.email_id == form_data.username).first()
@@ -28,9 +40,35 @@ async def doctor_login(form_data: OAuth2PasswordRequestForm= Depends(), db: Sess
     
     access_token = create_access_token({"sub": doctor.email_id} )
 
-    return { "access_token": access_token, "token_type": "bearer"}
+    response = RedirectResponse(
+        url="/doctor/dashboard",
+        status_code=303
+    )
 
-@app.get("/doctor/profile")
+    response.set_cookie(
+        key="doctor_token",
+        value=access_token,
+        httponly=True,
+        samesite="lax"
+    )
+
+    return response
+
+@router.get("/doctor/register-page", response_class=HTMLResponse)
+async def get_doctor_register_page(request: Request):
+    return templates1.TemplateResponse(
+        request=request, 
+        name="doctor_register.html"   
+    )
+
+
+@router.get("/doctor/logout")
+async def logout_doctor():
+    response = RedirectResponse(url="/", status_code=303)
+    response.delete_cookie(key="doctor_token")   
+    return response
+
+@router.get("/doctor/profile")
 async def get_profile( current_user: Doctor = Depends(get_current_doctor)):
     return {
         "name": current_user.name,
@@ -43,8 +81,18 @@ async def get_profile( current_user: Doctor = Depends(get_current_doctor)):
         "education":current_user.education
     }
 
+@router.get("/doctor/profile-page", response_class=HTMLResponse)
+async def get_doctor_profile_page(
+    request: Request, 
+    current_doctor: Doctor = Depends(get_current_doctor) 
+):
+    return templates.TemplateResponse(
+        request=request, 
+        name="doctor_profile.html", 
+        context={"doctor": current_doctor}
+    )
 
-@app.post("/doctor/update-profile")
+@router.post("/doctor/update-profile")
 async def update_profile(profile_data: ProfileUpdate, current_doctor: Doctor = Depends(get_current_doctor), db: Session= Depends(get_db)):
     query=db.query(Doctor).filter(Doctor.email_id==current_doctor.email_id)
     user=query.first()
@@ -80,22 +128,31 @@ def time_slot_generator(start_time: time, end_time: time):
         if slot <= end:
             slots.append({"start_time": start.time(), "end_time": slot.time() })
         start = slot
+
     return slots
 
     
     
-#Set the available slots for a day/days
-@app.post("/doctor/availability")
-async def doctor_availability(availability_data: DoctorAvailability,current_doctor: Doctor = Depends(get_current_doctor), db: Session= Depends(get_db)):
-    doctor= db.query(Doctor).filter(Doctor.doctor_id==current_doctor.doctor_id).first()
+@router.post("/doctor/availability")
+async def doctor_availability(
+    request: Request,
+    date_str: str = Form(...),
+    start_time: str = Form(...),
+    end_time: str = Form(...),
+    current_doctor: Doctor = Depends(get_current_doctor), 
+    db: Session = Depends(get_db)
+):
+    doctor = db.query(Doctor).filter(Doctor.doctor_id == current_doctor.doctor_id).first()
 
     if not doctor:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail="Doctor profile not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Doctor profile not found")
     
-
     try:
-    
-        slots = time_slot_generator(availability_data.start_time, availability_data.end_time)
+        # Convert incoming string times from HTML form to time objects
+        start = datetime.strptime(start_time, "%H:%M").time()
+        end = datetime.strptime(end_time, "%H:%M").time()
+        
+        slots = time_slot_generator(start, end)
 
         if len(slots) == 0:
             raise HTTPException(
@@ -103,24 +160,38 @@ async def doctor_availability(availability_data: DoctorAvailability,current_doct
                 detail="No slots available"
             )
 
-        availability = Availability(
-            doctor_id=current_doctor.doctor_id,
-            date_str=availability_data.date_str,
-            start_time=availability_data.start_time,
-            end_time=availability_data.end_time,
-            is_available=availability_data.is_available
+        created_slots = []
+        for slot in slots:
+            db_slot = Availability(
+                doctor_id=current_doctor.doctor_id,
+                date_str=date_str,
+                start_time=slot["start_time"],
+                end_time=slot["end_time"],
+                is_available=True
+            )
+            db.add(db_slot)
+            created_slots.append(db_slot)
+
+        db.commit()  # Commits ALL slots securely into the DB
+
+        
+        return templates.TemplateResponse(
+            request=request,
+            name="doctor_set_availability.html",
+            context={
+                "request": request,
+                "doctor": current_doctor,
+                "slots": slots,
+                "selected_date": date_str,
+                "success_message": "Slots saved successfully!"
+            }
         )
 
-        db.add(availability)
-        db.commit()
-        db.refresh(availability)
-
-        return {"message": "Availability created successfully", "availability_id": availability.id, "slots": slots }
-
     except Exception as e:
+        db.rollback() 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-@app.get("/doctor/appointments")
+    
+@router.get("/doctor/appointments")
 async def get_appointments(current_doctor:Doctor = Depends(get_current_doctor), db: Session= Depends(get_db)):
     appointments = (db.query(Appointment).filter(Appointment.doctor_id == current_doctor.doctor_id).order_by(Appointment.appointment_date, Appointment.start_time).all())
 
@@ -139,7 +210,7 @@ async def get_appointments(current_doctor:Doctor = Depends(get_current_doctor), 
 
     return result
 
-@app.patch("/doctor/update-appointments-status/{appointment_id}")
+@router.patch("/doctor/update-appointments-status/{appointment_id}")
 async def update_appointments_status(appointment_id: int,data:AppointmentStatusUpdate,current_doctor: Doctor = Depends(get_current_doctor),db: Session = Depends(get_db)):
     appointment = (db.query(Appointment).filter(Appointment.appointment_id == appointment_id).first())
     if not appointment:
@@ -169,3 +240,100 @@ async def update_appointments_status(appointment_id: int,data:AppointmentStatusU
         "appointment_id": appointment.appointment_id,
         "status": appointment.status
         }
+
+@router.get("/doctor/dashboard")
+async def doctor_dashboard(
+    request: Request,
+    current_doctor: Doctor = Depends(get_current_doctor),
+    db: Session = Depends(get_db)
+):
+
+    total_doctors = db.query(Doctor).count()
+
+    total_appointments = db.query(Appointment).count()
+
+    pending_requests = db.query(Appointment).filter(
+        Appointment.status == "Scheduled"
+    ).count()
+
+    todays_appointments = db.query(Appointment).filter(
+        Appointment.doctor_id == current_doctor.doctor_id,
+        Appointment.appointment_date == date.today()
+    ).count()
+
+    return templates.TemplateResponse(
+    request=request,
+    name="doctor_dashboard.html",
+    context={
+        "doctor": current_doctor,
+        "total_doctors": total_doctors,
+        "total_appointments": total_appointments,
+        "pending_requests": pending_requests,
+        "todays_appointments": todays_appointments
+    }
+)
+
+@router.get("/doctor/appointments-page")
+def doctor_appointments_page(
+    request: Request,
+    current_doctor: Doctor = Depends(get_current_doctor),
+    db: Session = Depends(get_db)
+):
+
+    appointments = (
+        db.query(Appointment)
+        .filter(Appointment.doctor_id == current_doctor.doctor_id)
+        .order_by(Appointment.appointment_date, Appointment.start_time)
+        .all()
+    )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="doctor_view_appointments.html",
+        context={
+            "request": request,
+            "appointments": appointments
+        }
+    )
+
+@router.get("/doctor/availability-page")
+def doctor_availability_page(
+    request: Request,
+    current_doctor: Doctor = Depends(get_current_doctor)
+):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="doctor_set_availability.html",
+        context={
+            "request": request,
+            "doctor": current_doctor,
+            "slots": []
+        }
+    )
+
+@router.post("/doctor/availability-page")
+async def generate_availability_slots(
+    request: Request,
+    date_str: str = Form(...),
+    start_time: str = Form(...),
+    end_time: str = Form(...),
+    current_doctor: Doctor = Depends(get_current_doctor)
+):
+    
+    start = datetime.strptime(start_time, "%H:%M").time()
+    end = datetime.strptime(end_time, "%H:%M").time()
+    
+    slots = time_slot_generator(start, end)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="doctor_set_availability.html",
+        context={
+            "request": request,
+            "doctor": current_doctor,
+            "slots": slots,
+            "selected_date": date_str
+        }
+    )
+

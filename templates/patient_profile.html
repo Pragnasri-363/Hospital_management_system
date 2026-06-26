@@ -1,69 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Dashboard</title>
+    <title>Patient Profile</title>
     <link rel="stylesheet" href="../static/patient_dashboard/patient_profile.css">
 </head>
+
 <body>
     <div class="profile-container">
-    
         <div class="profile-card">
-    
             <div class="profile-banner"></div>
-    
             <div class="profile-header">
-    
-                <img src="images/profile.jpg" class="profile-image" alt="Profile">
-    
-                <h2>Pragna Sri</h2>
-    
+                <img src="{{ patient.profile_pic or 'https://github.com/mdo.png' }}" class="profile-image"
+                    alt="Profile">
+                <h2>{{ patient.name }}</h2>
                 <p class="role-tag">Patient</p>
-    
             </div>
-    
             <div class="profile-details">
-    
-                <div class="detail-box">
-                    <label>Full Name</label>
-                    <input type="text" value="Pragna Sri" readonly>
+                <div class="detail-box"><label>Full Name</label><input type="text" value="{{ patient.name }}" readonly>
                 </div>
-    
-                <div class="detail-box">
-                    <label>Email Address</label>
-                    <input type="email" value="pragna@gmail.com" readonly>
+                <div class="detail-box"><label>Email Address</label><input type="email" value="{{ patient.email_id }}"
+                        readonly></div>
+                <div class="detail-box"><label>Phone Number</label><input type="text" value="{{ patient.phone_no }}"
+                        readonly></div>
+                <div class="detail-box"><label>Gender</label><input type="text" value="{{ patient.gender }}" readonly>
                 </div>
-    
-                <div class="detail-box">
-                    <label>Phone Number</label>
-                    <input type="text" value="9876543210" readonly>
-                </div>
-    
-                <div class="detail-box">
-                    <label>Gender</label>
-                    <input type="text" value="Female" readonly>
-                </div>
-    
-                <div class="detail-box">
-                    <label>Age</label>
-                    <input type="text" value="20" readonly>
-                </div>
-    
-    
+                <div class="detail-box"><label>Age</label><input type="text" value="{{ patient.age }}" readonly></div>
             </div>
             <div class="profile-actions">
-                <button class="profile-btn">
-                    Edit
-                </button>
-
-                <button class="profile-btn">
-                    Save
-                </button>
+                <a href="/patient/profile/edit-page" class="profile-btn"
+                    style="text-decoration: none; text-align: center;">Edit</a>
             </div>
-
         </div>
-    
     </div>
 </body>
+
 </html>

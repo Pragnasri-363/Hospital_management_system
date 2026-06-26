@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="../static/admin_dashboard/admin_manage_doctors.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <div class="d-flex">
+        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-primary sidebar"> <a
+                href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none"> <svg
+                    class="bi pe-none me-2" width="40" height="32" aria-hidden="true">
+                    <use xlink:href="#bootstrap"></use>
+                </svg> <span class="fs-4">Health Care</span> </a>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                
+                <li> <a href="/admin/dashboard" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
+                            aria-hidden="true">
+                            <use xlink:href="#speedometer2"></use>
+                        </svg>
+                        Dashboard
+                    </a> </li>
+                <li> <a href="/admin/doctors" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
+                            aria-hidden="true">
+                            <use xlink:href="#table"></use>
+                        </svg>
+                        Manage Doctors
+                    </a> </li>
+                <li> <a href="/admin/appointments_page" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
+                            aria-hidden="true">
+                            <use xlink:href="#grid"></use>
+                        </svg>
+                        Appointments
+                    </a> </li>
+
+            </ul>
+            <hr>
+            <div class="dropdown"> <a href="#"
+                    class="d-flex align-items-center text-black text-decoration-none dropdown-toggle"
+                    data-bs-toggle="dropdown" aria-expanded="false"> <img src="https://github.com/mdo.png" alt=""
+                        width="32" height="32" class="rounded-circle me-2"> <strong>mdo</strong> </a>
+                <ul class="dropdown-menu dropdown-menu-black text-small shadow">
+
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><a class="dropdown-item" href="/admin/profile-page">Profile</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="/admin/logout">Sign out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+        
+            <div class="page-header">
+        
+                <h2>Manage Doctors</h2>
+        
+                <p>
+                    Add, search and view registered doctors.
+                </p>
+        
+            </div>
+        
+            <!-- Search -->
+        
+            <form method="GET" action="/admin/doctors" class="search-card">
+            
+                <h5>Search Doctor</h5>
+            
+                <div class="search-row">
+            
+                    <input type="text" name="name" class="form-control" placeholder="Search by name">
+            
+                    <input type="text" name="spec" class="form-control" placeholder="Search by specialization">
+            
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+            
+                </div>
+            
+            </form>
+            
+        
+            <!-- Add Doctor -->
+        
+            <div class="add-doctor-card">
+        
+                <h5>Add Doctor</h5>
+        
+                <form method="post" action="/admin/add_doctor_form">
+        
+                    <div class="row">
+        
+                        <div class="col-md-6 mb-3">
+                            <input type="text" class="form-control" placeholder="Doctor Name" name="name">
+                        </div>
+        
+                        <div class="col-md-6 mb-3">
+                            <input type="email" class="form-control" placeholder="Email" name="email_id">
+                        </div>
+        
+                        <div class="col-md-6 mb-3">
+                            <input type="password" class="form-control" placeholder="Password" name="password">
+                        </div>
+        
+                        <div class="col-md-6 mb-3">
+                            <input type="text" class="form-control" placeholder="Phone Number" name="phone_no">
+                        </div>
+        
+                        <div class="col-md-6 mb-3">
+                            <input type="text" class="form-control" placeholder="Specialization" name="specialization">
+                        </div>
+        
+                        <div class="col-md-6 mb-3">
+                            <input type="text" class="form-control" placeholder="Experience" name="experience">
+                        </div>
+        
+                        <div class="col-md-6 mb-3">
+                            <input type="text" class="form-control" placeholder="Education" name="education">
+                        </div>
+        
+                        <div class="col-md-6 mb-3">
+        
+                            <select class="form-select" name="gender">
+        
+                                <option>Male</option>
+        
+                                <option>Female</option>
+        
+                                <option>Other</option>
+        
+                            </select>
+        
+                        </div>
+        
+                    </div>
+        
+                    <button class="btn btn-primary">
+                        Add Doctor
+                    </button>
+        
+                </form>
+        
+            </div>
+        
+            <!-- Doctor List -->
+        
+            <div class="doctor-list-card">
+        
+                <h5>Registered Doctors</h5>
+        
+                <table>
+        
+                    <thead>
+        
+                        <tr>
+        
+                            <th>Name</th>
+        
+                            <th>Specialization</th>
+        
+                            <th>Experience</th>
+        
+                            <th>Phone</th>
+        
+                        </tr>
+        
+                    </thead>
+        
+                    <tbody>
+        
+                        {% for doctor in doctors %}
+        
+                        <tr>
+        
+                            <td>{{ doctor.name }}</td>
+        
+                            <td>{{ doctor.specialization }}</td>
+        
+                            <td>{{ doctor.experience }}</td>
+        
+                            <td>{{ doctor.phone_no }}</td>
+        
+                        </tr>
+        
+                        {% endfor %}
+        
+                    </tbody>
+        
+                </table>
+        
+            </div>
+        
+        </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

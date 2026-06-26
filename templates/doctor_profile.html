@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Profile</title>
+    <link rel="stylesheet" href="../static/patient_dashboard/patient_profile.css">
+    <style>
+        /* Hidden checkbox controller for zero-JS toggle */
+        #edit-toggle {
+            display: none;
+        }
+
+        /* Mode switching: Hide/Show actions based on toggle state */
+        #edit-toggle:not(:checked)~form .save-btn {
+            display: none;
+        }
+
+        #edit-toggle:checked~form .edit-btn-label {
+            display: none;
+        }
+
+        /* Visual indicator when editing is enabled */
+        #edit-toggle:checked~form .dynamic-input {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            pointer-events: auto;
+            /* Allows typing */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="profile-container">
+
+        <div class="profile-card">
+
+            <div class="profile-banner"></div>
+
+            <div class="profile-header">
+                <img src="/static/images/profile.jpg" class="profile-image" alt="Profile">
+                <h2>{{ doctor.name }}</h2>
+                <p class="role-tag">Doctor</p>
+            </div>
+
+            <input type="checkbox" id="edit-toggle">
+
+            <form action="/doctor/profile/edit-submit" method="POST">
+                <div class="profile-details">
+
+                    <div class="detail-box">
+                        <label>Full Name</label>
+                        <input type="text" name="name" class="dynamic-input" value="{{ doctor.name }}" readonly
+                            required>
+                    </div>
+
+                    <div class="detail-box">
+                        <label>Email Address</label>
+                        <input type="email" value="{{ doctor.email_id }}" readonly disabled style="opacity: 0.7;">
+                    </div>
+
+                    <div class="detail-box">
+                        <label>Phone Number</label>
+                        <input type="text" name="phone_no" class="dynamic-input" value="{{ doctor.phone_no }}" readonly
+                            required>
+                    </div>
+
+                    <div class="detail-box">
+                        <label>Specialization</label>
+                        <input type="text" name="specialization" class="dynamic-input"
+                            value="{{ doctor.specialization }}" readonly required>
+                    </div>
+
+                    <div class="detail-box">
+                        <label>Education</label>
+                        <input type="text" name="education" class="dynamic-input" value="{{ doctor.education }}"
+                            readonly required>
+                    </div>
+
+                    <div class="detail-box">
+                        <label>Experience (Years)</label>
+                        <input type="number" name="experience" class="dynamic-input" value="{{ doctor.experience }}"
+                            readonly required>
+                    </div>
+
+                </div>
+
+                <div class="profile-actions">
+                    <label for="edit-toggle" class="profile-btn edit-btn-label"
+                        style="text-align: center; cursor: pointer; display: inline-block;">Edit</label>
+
+                    <button type="submit" class="profile-btn save-btn">Save</button>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+</body>
+
+</html>

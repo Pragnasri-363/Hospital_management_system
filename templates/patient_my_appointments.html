@@ -16,25 +16,20 @@
                 </svg> <span class="fs-4">Health Care</span> </a>
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item"> <a href="#" class="nav-link active" aria-current="page"> <svg class="bi pe-none me-2"
-                            width="16" height="16" aria-hidden="true">
-                            <use xlink:href="#home"></use>
-                        </svg>
-                        Home
-                    </a> </li>
-                <li> <a href="#" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
+                
+                <li> <a href="/patient/dashboard" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
                             aria-hidden="true">
                             <use xlink:href="#speedometer2"></use>
                         </svg>
                         Dashboard
                     </a> </li>
-                <li> <a href="#" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
+                <li> <a href="/patient/book-appointment-page" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
                             aria-hidden="true">
                             <use xlink:href="#table"></use>
                         </svg>
                         Book Appointments
                     </a> </li>
-                <li> <a href="#" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
+                <li> <a href="/patient/my-appointments-page" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
                             aria-hidden="true">
                             <use xlink:href="#grid"></use>
                         </svg>
@@ -49,11 +44,11 @@
                 <ul class="dropdown-menu dropdown-menu-black text-small shadow">
         
                     <li><a class="dropdown-item" href="#">Settings</a></li>
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="/patient/profile-page">Profile</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    <li><a class="dropdown-item" href="/patient/logout">Sign out</a></li>
                 </ul>
             </div>
         </div>
@@ -76,61 +71,52 @@
         
             <!-- APPOINTMENTS LIST -->
             <div class="appointments-container">
-        
-                <!-- CARD 1 -->
-                <div class="appointment-card scheduled">
-        
+            
+                {% if appointments %}
+                {% for appt in appointments %}
+                <div class="appointment-card {{ appt.status.lower() }}">
+            
                     <div class="left">
-                        <h5>Dr. John Doe</h5>
-                        <p>Cardiology</p>
-        
-                        <span class="badge status-scheduled">Scheduled</span>
+                        <h5>{{ appt.doctor_name }}</h5>
+                        <p>{{ appt.specialization }}</p>
+            
+                        <span class="badge status-{{ appt.status.lower() }}">{{ appt.status }}</span>
                     </div>
-        
+            
                     <div class="middle">
-                        <p><i class="fa fa-calendar"></i> 22 June 2026</p>
-                        <p><i class="fa fa-clock"></i> 10:30 AM - 11:00 AM</p>
+                        <p><i class="fa fa-calendar"></i> {{ appt.appointment_date }}</p>
+                        <p><i class="fa fa-clock"></i> {{ appt.start_time }} - {{ appt.end_time }}</p>
                     </div>
-        
+            
                     <div class="right">
                         <button class="btn btn-outline-primary btn-sm">
                             View
                         </button>
-        
-                        <button class="btn btn-outline-danger btn-sm">
-                            Cancel
-                        </button>
+            
+                        {% if appt.status == "Scheduled" %}
+                        <form action="/patient/appointment/{{ appt.appointment_id }}/cancel" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                Cancel
+                            </button>
+                        </form>
+                        {% endif %}
                     </div>
-        
+            
                 </div>
-        
-                <!-- CARD 2 -->
-                <div class="appointment-card completed">
-        
-                    <div class="left">
-                        <h5>Dr. Sarah Smith</h5>
-                        <p>Neurology</p>
-        
-                        <span class="badge status-completed">Completed</span>
-                    </div>
-        
-                    <div class="middle">
-                        <p><i class="fa fa-calendar"></i> 18 June 2026</p>
-                        <p><i class="fa fa-clock"></i> 02:00 PM - 02:30 PM</p>
-                    </div>
-        
-                    <div class="right">
-                        <button class="btn btn-outline-secondary btn-sm">
-                            View
-                        </button>
-                    </div>
-        
+                {% endfor %}
+                {% else %}
+                <div class="alert alert-info text-center">
+                    You have no appointments scheduled at this time.
                 </div>
+                {% endif %}
+            
+            </div>
         
             </div>
         
         </div>
 
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

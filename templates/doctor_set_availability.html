@@ -9,36 +9,31 @@
 </head>
 <body>
     <div class="d-flex">
-        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-primary" style="width: 280px;height: 100vh;"> <a href="/"
+        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-primary sidebar"> <a href="/"
                 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none"> <svg
                     class="bi pe-none me-2" width="40" height="32" aria-hidden="true">
                     <use xlink:href="#bootstrap"></use>
                 </svg> <span class="fs-4">Health Care</span> </a>
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item"> <a href="#" class="nav-link active" aria-current="page"> <svg class="bi pe-none me-2"
-                            width="16" height="16" aria-hidden="true">
-                            <use xlink:href="#home"></use>
-                        </svg>
-                        Home
-                    </a> </li>
-                <li> <a href="#" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
+                
+                <li> <a href="/doctor/dashboard" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
                             aria-hidden="true">
                             <use xlink:href="#speedometer2"></use>
                         </svg>
                         Dashboard
                     </a> </li>
-                <li> <a href="#" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
+                <li> <a href="/doctor/availability-page" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
                             aria-hidden="true">
                             <use xlink:href="#table"></use>
                         </svg>
-                        Book Appointments
+                        Set Availability
                     </a> </li>
-                <li> <a href="#" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
+                <li> <a href="/doctor/appointments-page" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
                             aria-hidden="true">
                             <use xlink:href="#grid"></use>
                         </svg>
-                        My appointments
+                        View appointments
                     </a> </li>
     
             </ul>
@@ -50,55 +45,79 @@
                 <ul class="dropdown-menu dropdown-menu-black text-small shadow">
     
                     <li><a class="dropdown-item" href="#">Settings</a></li>
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="/doctor/profile-page">Profile</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    <li><a class="dropdown-item" href="/doctor/logout">Sign out</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="main-content">
         
-            <!-- HEADER -->
             <div class="page-header mb-4">
                 <h3>Set Availability</h3>
                 <p>Select date and time range to generate slots automatically</p>
             </div>
         
-            <!-- INPUT CARD -->
-            <div class="card p-4 mb-4">
+            <form method="post" action="/doctor/availability">
         
-                <h5 class="mb-3">Create Availability</h5>
+                <!-- INPUT CARD -->
+                <div class="card p-4 mb-4">
         
-                <!-- DATE -->
-                <label class="form-label">Select Date</label>
-                <input type="date" id="date" class="form-control mb-3">
+                    <h5 class="mb-3">Create Availability</h5>
         
-                <!-- START TIME -->
-                <label class="form-label">Start Time</label>
-                <input type="time" id="startTime" class="form-control mb-3">
+                    <label class="form-label">Select Date</label>
+                    <input type="date" name="date_str" class="form-control mb-3">
         
-                <!-- END TIME -->
-                <label class="form-label">End Time</label>
-                <input type="time" id="endTime" class="form-control mb-3">
+                    <label class="form-label">Start Time</label>
+                    <input type="time" name="start_time" class="form-control mb-3">
         
-                <button class="btn btn-primary w-100" id="generateSlotsBtn">
-                    Generate Slots
-                </button>
+                    <label class="form-label">End Time</label>
+                    <input type="time" name="end_time" class="form-control mb-3">
         
-            </div>
+                    <button class="btn btn-primary w-100" type="submit">
+                        Generate Slots
+                    </button>
+        
+                </div>
+        
+            </form>
         
             <!-- SLOTS DISPLAY -->
             <div class="card p-4">
-        
-                <h5>Generated Slots</h5>
-        
-                <div id="slotsContainer" class="slots-container mt-3"></div>
-        
+
+                    <h5>Generated Slots</h5>
+
+                    {% if success_message %}
+                    <div class="alert alert-success mt-2">
+                        {{ success_message }}
+                    </div>
+                    {% endif %}
+
+                    {% if slots %}
+
+                        <h6 class="mt-3 text-primary">
+                            Date: {{ selected_date }}
+                        </h6>
+
+                        <div class="mt-2">
+
+                            {% for slot in slots %}
+                                <div class="badge bg-primary me-2 mb-2">
+                                    {{ slot.start_time }} - {{ slot.end_time }}
+                                </div>
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+                        <p class="text-muted">No slots generated yet</p>
+                    {% endif %}
+
             </div>
-        
+                        
         </div>
 
     </div>

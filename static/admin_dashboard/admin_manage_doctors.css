@@ -66,145 +66,119 @@ main {
 .scrollarea {
     overflow-y: auto;
 }
+
 .d-flex.flex-column.flex-shrink-0 {
     background-color: #6FA8DC !important;
 }
+
 .nav-pills .nav-link.active {
 
     background-color: #EAF4FF !important;
 
     color: #0d3b66 !important;
 }
+.sidebar {
+    width: 280px;
+    min-height: 100vh;
+}
 .main-content {
 
     flex: 1;
 
-    min-height: 100vh;
+    padding: 30px;
 
     background: #f8fbff;
 
-}
-.sidebar{
-    width: 280px;
     min-height: 100vh;
 }
-.welcome-banner {
-    width: 100%;
-    padding: 15px 15px;
+.page-header {
+
+    margin-bottom: 25px;
 }
 
-.welcome-banner h2 {
+.page-header h2 {
 
     color: #0d3b66;
 
     font-weight: 700;
-
-    margin-bottom: 8px;
 }
-.welcome-banner p {
+
+.page-header p {
 
     color: #6c757d;
-    margin: 0;
-}
-.upcoming-appointments {
-    padding: 25px;
-    background: linear-gradient(135deg,
-                #D6F1FF,
-                #E6D5FF);
-    border-radius: 8px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    margin: 10px 20px;
-    max-width: 1150px;
-}
-.appointment-info {
-
-    display: flex;
-    gap: 50px;
-
-    align-items: center;
-
-    margin: 15px 0px;
-}
-.appointment-info span {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    font-size: 15px;
-}
-.stats-container {
-
-    display: flex;
-
-    gap: 30px;
-    margin-left: 20px ;
-    margin-top: 25px;
-    max-width: 1150px;
-    margin-bottom: 25px;
 }
 
-.stats-card {
-
-    flex: 1;
+.search-card,
+.add-doctor-card,
+.doctor-list-card {
 
     background: white;
 
-    padding: 15px 20px;
+    padding: 24px;
 
-    border-radius: 8px;
+    border-radius: 16px;
 
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
 
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.stats-card:hover {
+.search-card h5,
+.add-doctor-card h5,
+.doctor-list-card h5 {
 
-    transform: translateY(-5px);
+    margin-bottom: 20px;
+
+    color: #0d3b66;
 }
 
-.stats-card i {
+.search-row {
 
-    font-size: 20px;
+    display: flex;
 
-    color: black;
-
-    margin-bottom: 15px;
+    gap: 15px;
 }
 
-.stats-card h4 {
+.search-row input {
 
-    font-size: 25px;
-
-    font-weight: 700;
-
-    color: #1F3B5B;
-
-    margin-bottom: 5px;
+    flex: 1;
+}
+.doctor-list-card table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
 }
 
-.stats-card p {
+.doctor-list-card thead {
+    background: #EAF4FF;
+}
 
-    color: #6c757d;
-
-    margin: 0;
-
+.doctor-list-card th {
+    padding: 16px;
+    text-align: left;
+    color: #0d3b66;
+    font-weight: 600;
+    font-size: 15px;
+    border-bottom: 2px solid #d6e9ff;
+}
+.doctor-list-card td {
+    padding: 16px;
+    color: #495057;
     font-size: 14px;
-}
-.total-card {
-
-    background: #D6EFFF;
-
-}
-.pending-card {
-    background: #F3E8FF;
+    border-bottom: 1px solid #eef2f7;
 }
 
-.completed-card {
+.doctor-list-card tbody tr {
+    transition: background 0.2s ease;
+}
 
-    background: #FFF0EA;
+.doctor-list-card tbody tr:hover {
+    background: #f8fbff;
+}
 
+.doctor-list-card tbody tr:last-child td {
+    border-bottom: none;
 }

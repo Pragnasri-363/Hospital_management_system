@@ -66,31 +66,32 @@ main {
 .scrollarea {
     overflow-y: auto;
 }
+
 .d-flex.flex-column.flex-shrink-0 {
     background-color: #6FA8DC !important;
 }
+
 .nav-pills .nav-link.active {
 
     background-color: #EAF4FF !important;
 
     color: #0d3b66 !important;
 }
+
 .main-content {
 
     flex: 1;
 
-    min-height: 100vh;
+    padding: 30px;
 
     background: #f8fbff;
 
-}
-.sidebar{
-    width: 280px;
     min-height: 100vh;
 }
+
 .welcome-banner {
-    width: 100%;
-    padding: 15px 15px;
+
+    margin-bottom: 25px;
 }
 
 .welcome-banner h2 {
@@ -99,112 +100,53 @@ main {
 
     font-weight: 700;
 
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
+
 .welcome-banner p {
 
     color: #6c757d;
+
     margin: 0;
 }
-.upcoming-appointments {
-    padding: 25px;
-    background: linear-gradient(135deg,
-                #D6F1FF,
-                #E6D5FF);
-    border-radius: 8px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    margin: 10px 20px;
-    max-width: 1150px;
-}
-.appointment-info {
 
-    display: flex;
-    gap: 50px;
-
-    align-items: center;
-
-    margin: 15px 0px;
-}
-.appointment-info span {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    font-size: 15px;
-}
 .stats-container {
 
     display: flex;
 
-    gap: 30px;
-    margin-left: 20px ;
-    margin-top: 25px;
-    max-width: 1150px;
-    margin-bottom: 25px;
+    gap: 20px;
+
+    margin-bottom: 30px;
 }
 
 .stats-card {
 
-    flex: 1;
+    width: 260px;
 
-    background: white;
+    padding: 22px;
 
-    padding: 15px 20px;
+    border-radius: 16px;
 
-    border-radius: 8px;
-
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
-
-.stats-card:hover {
-
-    transform: translateY(-5px);
+.doctors-card{
+    background: #EAF7FF;
 }
-
-.stats-card i {
-
-    font-size: 20px;
-
-    color: black;
-
-    margin-bottom: 15px;
+.appointments-card{
+    background: #FFF3E8;
 }
+.stats-card h3 {
 
-.stats-card h4 {
+    margin: 0;
 
-    font-size: 25px;
+    font-size: 30px;
 
     font-weight: 700;
-
-    color: #1F3B5B;
-
-    margin-bottom: 5px;
 }
 
 .stats-card p {
 
+    margin-top: 5px;
+
     color: #6c757d;
-
-    margin: 0;
-
-    font-size: 14px;
-}
-.total-card {
-
-    background: #D6EFFF;
-
-}
-.pending-card {
-    background: #F3E8FF;
-}
-
-.completed-card {
-
-    background: #FFF0EA;
-
 }

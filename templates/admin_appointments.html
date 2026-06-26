@@ -5,20 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='admin_dashboard/admin_dashboard.css') }}">
+    <link rel="stylesheet" href="../static/admin_dashboard/admin_appointments.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
     <div class="d-flex">
-        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-primary" style="width: 280px;height: 100vh;"> <a
+        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-primary sidebar" > <a
                 href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none"> <svg
                     class="bi pe-none me-2" width="40" height="32" aria-hidden="true">
                     <use xlink:href="#bootstrap"></use>
                 </svg> <span class="fs-4">Health Care</span> </a>
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
+            
                 <li> <a href="/admin/dashboard" class="nav-link text-black"> <svg class="bi pe-none me-2" width="16" height="16"
                             aria-hidden="true">
                             <use xlink:href="#speedometer2"></use>
@@ -55,44 +56,67 @@
                 </ul>
             </div>
         </div>
-
+        
         <div class="main-content">
         
-            <div class="welcome-banner">
+            <div class="page-header">
         
-                <h2>Welcome Back, Admin</h2>
+                <h2>Appointments</h2>
         
                 <p>
-                    Manage doctors and appointments efficiently.
+                    View all appointments across the system.
                 </p>
         
             </div>
         
-            <div class="stats-container">
-        
-                <div class="stats-card doctors-card">
-        
-                    <h3>{{ total_doctors }}</h3>
-        
-                    <p>Total Doctors</p>
-        
-                </div>
-        
-                <div class="stats-card appointments-card">
-        
-                    <h3>{{ total_appointments }}</h3>
-        
-                    <p>Total Appointments</p>
-        
-                </div>
-        
-            </div>
-        
+            <form class="search-card" method="get" action="/admin/appointments_page">
+                <input type="text" class="form-control" name="search" placeholder="Search patient or doctor"
+                    value="{{ search or '' }}">
+                <button type="submit" class="btn btn-primary mt-2">
+                    Search
+                </button>
+            </form>
             
-        
-        </div>
+            <div class="appointment-list-card">
+                <h5>All Appointments</h5>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr>
+                            <td>{{ appointment.appointment_id }}</td>
+                            <td>{{ appointment.patient_name }}</td>
+                            <td>{{ appointment.doctor_name }}</td>
+                            <td>{{ appointment.appointment_date }}</td>
+                            <td>
+                                {{ appointment.start_time }} - {{ appointment.end_time }}
+                            </td>
+                            <td>
+                                <span class="status-badge">
+                                    {{ appointment.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #888; padding: 20px;">No appointments found matching
+                                your criteria.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+    </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

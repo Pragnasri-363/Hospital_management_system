@@ -12,7 +12,7 @@
 <body>
     <div class="login-container">
         <div class="login-card">
-            <form action="/patient/login" method="post">
+            <form action="/doctor/login" method="post">
 
                 <h2 class="portal-heading">Doctor Login</h2>
 
@@ -21,7 +21,7 @@
                         <i class="fa-solid fa-envelope"></i>
                     </label>
 
-                    <input type="email" placeholder="Email Address" class="field-input" name="email" required>
+                    <input type="email" placeholder="Email Address" class="field-input" name="username" required>
                 </div>
 
                 <div class="field-group">
@@ -35,6 +35,14 @@
                 <button type="submit" class="portal-button">
                     Login
                 </button>
+
+                <div class="account-action">
+                    Don't have an account?
+
+                    <a href="/doctor-register" class="register-action">
+                        Register Here
+                    </a>
+                </div>
 
             </form>
         </div>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Profile</title>
+    <link rel="stylesheet" href="../static/patient_dashboard/patient_profile.css">
+</head>
+
+<body>
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-banner"></div>
+
+            <div class="profile-header">
+                <img src="{{ admin.pic or '/static/images/profile.jpg' }}" class="profile-image" alt="Profile">
+                <h2>{{ admin.name }}</h2>
+                <p class="role-tag">Administrator</p>
+            </div>
+
+            <form action="/admin/profile/edit-submit" method="POST">
+                <div class="profile-details">
+                    <div class="detail-box">
+                        <label>Full Name</label>
+                        <input type="text" name="name" value="{{ admin.name }}" required>
+                    </div>
+                    <div class="detail-box">
+                        <label>Email Address</label>
+                        <input type="email" value="{{ admin.email }}" readonly disabled style="opacity: 0.7;">
+                    </div>
+                    <div class="detail-box">
+                        <label>Phone Number</label>
+                        <input type="text" name="phone_no" value="{{ admin.phone }}" required>
+                    </div>
+                    <div class="detail-box">
+                        <label>Gender</label>
+                        <input type="text" name="gender" value="{{ admin.gender }}" required>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button type="submit" class="profile-btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
